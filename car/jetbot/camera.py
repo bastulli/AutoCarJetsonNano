@@ -18,12 +18,11 @@ class Camera(SingletonConfigurable):
     capture_height = traitlets.Integer(default_value=2464).tag(config=True)
 
     def __init__(self, *args, **kwargs):
-        self.value = np.empty((self.width, self.height, 3), dtype=np.uint8)
+        self.value = np.empty((self.height, self.width, 3), dtype=np.uint8)
         super(Camera, self).__init__(*args, **kwargs)
 
         try:
             self.cap = cv2.VideoCapture(self._gst_str(), cv2.CAP_GSTREAMER)
-            #self.cap = cv2.VideoCapture(gstreamer_pipeline(flip_method=2), cv2.CAP_GSTREAMER)
 
             re, image = self.cap.read()
 
@@ -34,7 +33,8 @@ class Camera(SingletonConfigurable):
             self.start()
         except:
             self.stop()
-            raise RuntimeError('Could not initialize camera.  Please see error trace.')
+            raise RuntimeError(
+                'Could not initialize camera.  Please see error trace.')
 
         atexit.register(self.stop)
 

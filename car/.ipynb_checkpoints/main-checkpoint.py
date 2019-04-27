@@ -5,11 +5,10 @@ from adafruit_pca9685 import PCA9685
 from adafruit_motor import servo
 from adafruit_motor import motor
 from controller import PS4Controller
-import camera3
+#import camera
 
 #init controller
 ps4 = PS4Controller()
-ps4.init()
 
 #init i2c
 i2c = busio.I2C(SCL, SDA)
@@ -30,7 +29,7 @@ def scale_esc(x):
     return y
     
 def drive(axis_data):
-    servo_steer.angle = scale_servo(-axis_data[0])
+    servo_steer.angle = scale_servo(axis_data[0])
     sum_inputs = round(-scale_esc(axis_data[4]) + scale_esc(axis_data[3]),2)
     esc.throttle = sum_inputs
     #print(sum_inputs)
@@ -43,7 +42,7 @@ train = False
 trig = True
 
 #init Camera
-cam = camera3.Camera()
+#camera = Camera.instance(width=224, height=224)
 
 try:
     while True:
@@ -59,9 +58,9 @@ try:
             pass
         
         if train:
-            #print('Training Mode!')
+            print('Training Mode!')
             drive(axis_data)
-            print(type(cam.value))
+            csave_camera
         else:
             print('Auto Pilot Mode!')
             

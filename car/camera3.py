@@ -1,29 +1,23 @@
-import traitlets
-from traitlets.config.configurable import SingletonConfigurable
 import atexit
 import cv2
 import threading
 import numpy as np
 
 
-class Camera(SingletonConfigurable):
-    
-    value = traitlets.Any()
-    
-    # config
-    width = traitlets.Integer(default_value=224).tag(config=True)
-    height = traitlets.Integer(default_value=224).tag(config=True)
-    fps = traitlets.Integer(default_value=21).tag(config=True)
-    capture_width = traitlets.Integer(default_value=3280).tag(config=True)
-    capture_height = traitlets.Integer(default_value=2464).tag(config=True)
+class Camera():
 
-    def __init__(self, *args, **kwargs):
-        self.value = np.empty((self.width, self.height, 3), dtype=np.uint8)
-        super(Camera, self).__init__(*args, **kwargs)
+    def __init__(self):
+        self.value = np.empty((224, 224, 3), dtype=np.uint8)
+        #super(Camera, self).__init__(*args, **kwargs)
+        self.capture_width=224
+        self.capture_height=224
+        self.fps=21
+        self.width=224
+        self.height=224
 
         try:
             self.cap = cv2.VideoCapture(self._gst_str(), cv2.CAP_GSTREAMER)
-            #self.cap = cv2.VideoCapture(gstreamer_pipeline(flip_method=2), cv2.CAP_GSTREAMER)
+            #self.cap = cv2.VideoCapture(self._gstreamer_pipeline(flip_method=2), cv2.CAP_GSTREAMER)
 
             re, image = self.cap.read()
 
@@ -32,6 +26,7 @@ class Camera(SingletonConfigurable):
 
             self.value = image
             self.start()
+
         except:
             self.stop()
             raise RuntimeError('Could not initialize camera.  Please see error trace.')
@@ -45,11 +40,21 @@ class Camera(SingletonConfigurable):
                 self.value = image
             else:
                 break
-                
-    def _gst_str(self):
+        '''def _gst_str(self):
         return 'nvarguscamerasrc ! video/x-raw(memory:NVMM), width=%d, height=%d, format=(string)NV12, framerate=(fraction)%d/1 ! nvvidconv ! video/x-raw, width=(int)%d, height=(int)%d, format=(string)BGRx ! videoconvert ! appsink' % (
-                self.capture_width, self.capture_height, self.fps, self.width, self.height)
-    
+                self.capture_width, self.capture_height, self.fps, self.width, self.height)'''
+
+
+    def _gst_str(self):  
+        return ('nvarguscamerasrc ! ' 
+        'video/x-raw(memory:NVMM), '
+        'width=(int)%d, height=(int)%d, '
+        'format=(string)NV12, framerate=(fraction)%d/1 ! '
+        'nvvidconv flip-method=%d ! '
+        'video/x-raw, width=(int)%d, height=(int)%d, format=(string)BGRx ! '
+        'videoconvert ! '
+        'video/x-raw, format=(string)BGR ! appsink'  % (self.capture_width,self.capture_height,self.fps,2,self.capture_width,self.capture_height))
+
     def start(self):
         if not self.cap.isOpened():
             self.cap.open(self._gst_str(), cv2.CAP_GSTREAMER)
@@ -66,3 +71,15 @@ class Camera(SingletonConfigurable):
     def restart(self):
         self.stop()
         self.start()
+
+if __name__ == "__main__":
+    import sys
+
+    cam = Camera()
+    
+    try:
+        while True:
+            print(type(cam.value))
+
+    except KeyboardInterrupt:
+        sys.exit(0)

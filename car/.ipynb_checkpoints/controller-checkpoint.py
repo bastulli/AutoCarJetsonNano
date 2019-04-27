@@ -25,9 +25,9 @@ class PS4Controller(object):
         pygame.joystick.init()
         self.controller = pygame.joystick.Joystick(0)
         self.controller.init()
-        self.axis_data = False
-        self.button_data = False
-        self.hat_data = False       
+        self.axis_data = None
+        self.button_data = None
+        self.hat_data = None       
         
         print('Pygame init complete')
 
