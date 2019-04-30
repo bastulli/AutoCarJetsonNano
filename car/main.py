@@ -5,7 +5,10 @@ from adafruit_pca9685 import PCA9685
 from adafruit_motor import servo
 from adafruit_motor import motor
 from controller import PS4Controller
-import camera3
+import camera
+import datetime
+import cv2
+import csv
 
 #init controller
 ps4 = PS4Controller()
@@ -43,28 +46,45 @@ train = False
 trig = True
 
 #init Camera
-cam = camera3.Camera()
+cam = camera.Camera()
+
+#initial content
+with open('control_data.csv','w') as f:
+    f.write('date,steering,speed\n1,1,1\n') # TRAILING NEWLINE
+
+def save_data(img,axis_data):
+    x = datetime.datetime.now()
+    cv2.imwrite('images/'+str(x)+".jpg", img)
+    
+    with open('control_data.csv','a',newline='') as f:
+        writer=csv.writer(f)
+        writer.writerow([x,axis_data[0],axis_data[4]])
+    print('save image!')
+    
+print('Running!')
 
 try:
     while True:
+    
         button_data, axis_data, hat_data = ps4.listen()
         
         if button_data[1] == True and trig:
             train = toggle(train)
             trig = False
-            print(train)
+            
         elif button_data[1] == False:
             trig = True
         else:
             pass
         
         if train:
-            #print('Training Mode!')
             drive(axis_data)
-            print(type(cam.value))
+            if axis_data[4] >= 0.12:
+                save_data(cam.value,axis_data)
+            else:
+                print('Not saving img')
         else:
-            print('Auto Pilot Mode!')
-            
+            pass            
 
 
 except KeyboardInterrupt:
