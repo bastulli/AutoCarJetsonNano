@@ -14,6 +14,7 @@ class Camera():
         self.fps=21
         self.width=224
         self.height=224
+        self.count = 0
 
         try:
             self.cap = cv2.VideoCapture(self._gst_str(), cv2.CAP_GSTREAMER)
@@ -23,7 +24,7 @@ class Camera():
 
             if not re:
                 raise RuntimeError('Could not read image from camera.')
-
+           
             self.value = image
             self.start()
 
@@ -38,6 +39,7 @@ class Camera():
             re, image = self.cap.read()
             if re:
                 self.value = image
+                self.count += 1
             else:
                 break
         '''def _gst_str(self):
@@ -79,7 +81,8 @@ if __name__ == "__main__":
     
     try:
         while True:
-            print(type(cam.value))
+            #print(type(cam.value))
+            print(cam.count)
 
     except KeyboardInterrupt:
         sys.exit(0)
