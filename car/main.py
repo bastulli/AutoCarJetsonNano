@@ -6,9 +6,9 @@ from adafruit_motor import servo
 from adafruit_motor import motor
 from controller import PS4Controller
 import camera
-import datetime
 import cv2
 import csv
+from uuid import uuid1
 
 class Autocar():
 
@@ -51,15 +51,14 @@ class Autocar():
     
         count = self.cam.count
         img = self.cam.value
-        print(count)
 
         if count!= self.temp:
-            x = datetime.datetime.now()
-            cv2.imwrite('images/'+str(x)+".jpg", img)
+            num = uuid1()
+            cv2.imwrite('images/'+str(num)+".jpg", img)
             
             with open('control_data.csv','a',newline='') as f:
                 writer=csv.writer(f)
-                writer.writerow([x,axis_data[0],axis_data[4]])
+                writer.writerow([num,axis_data[0],axis_data[4]])
             self.temp = count
             print('Save data!')
         else:
