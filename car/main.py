@@ -92,6 +92,7 @@ class Autocar():
     def preprocess(self, camera_value):
     
         x = camera_value
+        x = cv2.resize(x, (224, 224))
         x = cv2.cvtColor(x, cv2.COLOR_BGR2RGB)
         x = x.transpose((2, 0, 1))
         x = torch.from_numpy(x).float()
@@ -108,7 +109,7 @@ class Autocar():
         
         if count!= self.temp:
             print('run model')
-            angle = self.model.eval(img[0])
+            angle = self.model.eval(img).detach().cpu()
             print(angle)
             self.temp = count
             
