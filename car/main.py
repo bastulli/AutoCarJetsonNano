@@ -29,15 +29,21 @@ class Autocar():
         self.esc = servo.ContinuousServo(self.pca.channels[1])
         
         # init model
-        self.device = torch.device('cuda')
-        self.model = neural_network.Net()
+        
+        model = neural_network.Net()
+        for param in model.parameters():
+            param.requires_grad = False
+        self.model = model.eval()
         self.model.load_state_dict(torch.load('model/autopilot.pt'))
-
+        self.device = torch.device('cuda')
+        self.model.to(self.device)
+        
         # init vars
         self.temp = 0
         mean = 255.0 * np.array([0.485, 0.456, 0.406])
         stdev = 255.0 * np.array([0.229, 0.224, 0.225])
         self.normalize = torchvision.transforms.Normalize(mean, stdev)
+        self.angle_out = 0
 
         # init Camera
         self.cam = camera.Camera()        
@@ -65,7 +71,6 @@ class Autocar():
         self.servo_steer.angle = self.scale_servo(-axis_data[0])
         sum_inputs = round(-self.scale_esc(axis_data[4]) + self.scale_esc(axis_data[3]),2)
         self.esc.throttle = sum_inputs
-        print(sum_inputs)
 
     def save_data(self, axis_data):
     
@@ -88,6 +93,7 @@ class Autocar():
             
         else:
             pass
+        
             
     def preprocess(self, camera_value):
     
@@ -108,13 +114,18 @@ class Autocar():
         count = self.cam.count
         
         if count!= self.temp:
-            print('run model')
-            angle = self.model.eval(img).detach().cpu()
-            print(angle)
+            print('RUN!')
+            output = self.model(img)
+            _, angle_tensor = torch.max(output,1)
+            angle = np.squeeze(angle_tensor)
+            self.angle_out = angle[0].cpu().numpy()
             self.temp = count
+            print(self.angle_out)
             
         else:
             pass
+        
+        self.drive({0:self.angle_out,1:0.0,2:0.0,3:-1.0,4:1,5:0.0})
         
 
 if __name__ == "__main__":
