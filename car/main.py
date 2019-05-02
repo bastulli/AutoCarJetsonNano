@@ -1,4 +1,7 @@
 import sys
+import torch
+import torchvision
+import numpy as np
 from board import SCL, SDA
 import busio
 from adafruit_pca9685 import PCA9685
@@ -9,40 +12,56 @@ import camera
 import cv2
 import csv
 from uuid import uuid1
+import neural_network
+
 
 class Autocar():
 
     def __init__(self):
-        #init i2c
+        # init i2c
         i2c = busio.I2C(SCL, SDA)
 
-        #init PCA
+        # init PCA
         self.pca = PCA9685(i2c)
         self.pca.frequency = 50
 
         self.servo_steer = servo.Servo(self.pca.channels[0])
         self.esc = servo.ContinuousServo(self.pca.channels[1])
+        
+        # init model
+        self.device = torch.device('cuda')
+        self.model = neural_network.Net()
+        self.model.load_state_dict(torch.load('model/autopilot.pt'))
 
-        #init vars
-
+        # init vars
         self.temp = 0
+        mean = 255.0 * np.array([0.485, 0.456, 0.406])
+        stdev = 255.0 * np.array([0.229, 0.224, 0.225])
+        self.normalize = torchvision.transforms.Normalize(mean, stdev)
 
-        #init Camera
+        # init Camera
         self.cam = camera.Camera()        
 
-        #initial content
+        # initial content
         with open('control_data.csv','w') as f:
-            f.write('date,steering,speed\n') # TRAILING NEWLINE
+            f.write('date,steering,speed\n')
         
     def scale_servo(self, x):
-        y = round((30-70)*x+1/1+1+70,2) #used to scale -1,1 to 0,180
+    
+        # used to scale -1,1 to 0,180
+        y = round((30-70)*x+1/1+1+70,2) 
+        
         return y
 
     def scale_esc(self, x):
-        y = round((x+1)/8,2) #used to scale -1,1 to 0,180
+    
+        # used to scale -1,1 to 0,180
+        y = round((x+1)/8,2)
+        
         return y
         
     def drive(self, axis_data):
+    
         self.servo_steer.angle = self.scale_servo(-axis_data[0])
         sum_inputs = round(-self.scale_esc(axis_data[4]) + self.scale_esc(axis_data[3]),2)
         self.esc.throttle = sum_inputs
@@ -53,14 +72,44 @@ class Autocar():
         img = self.cam.value
 
         if count!= self.temp:
+        
             num = uuid1()
             cv2.imwrite('images/'+str(num)+".jpg", img)
             
+            # append inputs to csv
             with open('control_data.csv','a',newline='') as f:
                 writer=csv.writer(f)
                 writer.writerow([num,axis_data[0],axis_data[4]])
+                
             self.temp = count
+            
             print('Save data!')
+            
+        else:
+            pass
+            
+    def preprocess(camera_value):
+    
+        x = camera_value
+        x = cv2.cvtColor(x, cv2.COLOR_BGR2RGB)
+        x = x.transpose((2, 0, 1))
+        x = torch.from_numpy(x).float()
+        x = self.normalize(x)
+        x = x.to(self.device)
+        x = x[None, ...]
+        
+        return x        
+    
+    def autopilot(self):
+    
+        img = self.preprocess(self.cam.value)
+        count = self.cam.count
+        
+        if count!= self.temp:
+            angle = self.model.eval(img)
+            print(angle)
+            self.temp = count
+            
         else:
             pass
         
@@ -69,10 +118,11 @@ if __name__ == "__main__":
 
     car = Autocar()
     
-    #init controller
+    # init controller
     ps4 = PS4Controller()
     ps4.init()
     
+    # Start in training mode
     train = False
     trig = True
     
@@ -101,7 +151,7 @@ if __name__ == "__main__":
                 else:
                     print('Not saving img')
             else:
-                pass            
+                car.autopilot()
 
 
     except KeyboardInterrupt:
