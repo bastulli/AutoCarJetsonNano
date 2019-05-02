@@ -31,8 +31,6 @@ class Autocar():
         # init model
         
         model = neural_network.Net()
-        for param in model.parameters():
-            param.requires_grad = False
         self.model = model.eval()
         self.model.load_state_dict(torch.load('model/autopilot.pt'))
         self.device = torch.device('cuda')
@@ -115,17 +113,19 @@ class Autocar():
         
         if count!= self.temp:
             print('RUN!')
-            output = self.model(img)
+            self.model.eval()
+            with torch.no_grad():
+                output = self.model(img)
             _, angle_tensor = torch.max(output,1)
-            angle = np.squeeze(angle_tensor)
-            self.angle_out = angle[0].cpu().numpy()
+            self.angle_out = angle_tensor.cpu().data.numpy()
+            #self.angle_out = np.argmax(output.cpu().data.numpy())#angle[0].cpu().numpy()
             self.temp = count
             print(self.angle_out)
             
         else:
             pass
         
-        self.drive({0:self.angle_out,1:0.0,2:0.0,3:-1.0,4:1,5:0.0})
+        self.drive({0:0,1:0.0,2:0.0,3:-1.0,4:1,5:0.0})
         
 
 if __name__ == "__main__":
