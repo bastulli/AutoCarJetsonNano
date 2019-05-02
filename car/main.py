@@ -65,6 +65,7 @@ class Autocar():
         self.servo_steer.angle = self.scale_servo(-axis_data[0])
         sum_inputs = round(-self.scale_esc(axis_data[4]) + self.scale_esc(axis_data[3]),2)
         self.esc.throttle = sum_inputs
+        print(sum_inputs)
 
     def save_data(self, axis_data):
     
@@ -88,7 +89,7 @@ class Autocar():
         else:
             pass
             
-    def preprocess(camera_value):
+    def preprocess(self, camera_value):
     
         x = camera_value
         x = cv2.cvtColor(x, cv2.COLOR_BGR2RGB)
@@ -101,12 +102,13 @@ class Autocar():
         return x        
     
     def autopilot(self):
-    
+        
         img = self.preprocess(self.cam.value)
         count = self.cam.count
         
         if count!= self.temp:
-            angle = self.model.eval(img)
+            print('run model')
+            angle = self.model.eval(img[0])
             print(angle)
             self.temp = count
             
@@ -123,7 +125,7 @@ if __name__ == "__main__":
     ps4.init()
     
     # Start in training mode
-    train = False
+    train = True
     trig = True
     
     def toggle(x):
