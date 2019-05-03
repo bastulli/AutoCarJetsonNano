@@ -60,7 +60,7 @@ class Autocar():
     def scale_esc(self, x):
     
         # used to scale -1,1 to 0,180
-        y = round((x+1)/8,2)
+        y = round((x+1)/12,2)
         
         return y
         
@@ -116,16 +116,15 @@ class Autocar():
             self.model.eval()
             with torch.no_grad():
                 output = self.model(img)
-            _, angle_tensor = torch.max(output,1)
-            self.angle_out = angle_tensor.cpu().data.numpy()
+            self.angle_out = output.cpu().data.numpy()
             #self.angle_out = np.argmax(output.cpu().data.numpy())#angle[0].cpu().numpy()
             self.temp = count
-            print(self.angle_out)
+            print(self.angle_out[0][0])
             
         else:
             pass
         
-        self.drive({0:0,1:0.0,2:0.0,3:-1.0,4:1,5:0.0})
+        self.drive({0:self.angle_out[0][0],1:0.0,2:0.0,3:-1.0,4:1,5:0.0})
         
 
 if __name__ == "__main__":

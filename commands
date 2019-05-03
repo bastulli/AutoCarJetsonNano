@@ -1,5 +1,5 @@
 find . -type f -iname \*.jpg -delete
 
-cp -r /home/joe/Documents/AutoCarJetsonNano/car/images /media/joe
+sudo cp -r /home/joe/AutoCarJetsonNano/car/images /media/joe/usb
 
-cp -r /home/joe/Documents/AutoCarJetsonNano/car/control_data.csv /media/joe
+sudo cp -r /home/joe/AutoCarJetsonNano/car/control_data.csv /media/joe/usb
