@@ -3,7 +3,7 @@ PyTorch Python Neural Network Autonomous 1/10 Car for Nvidia Jetson Nano
 
 ![Jetson Nano 1/10th RC Car](media/carbg.png)
 
-![Demo](https://media.giphy.com/media/jn2q3m1mUHt7hx2DQe/giphy.gif)
+![Demo](media/JetsonNanoCarPytorch.gif)
 
 ## BOM
 
