@@ -29,8 +29,4 @@ PyTorch Python Neural Network Autonomous 1/10 Car for Nvidia Jetson Nano
 
 ## How to use
 
-Install python requirements
-
-Install ds4drv and connect PS4 Bluetooth controller to Ubuntu
-
-Inside AutoCarJetsonNano/car, start main.py and drive car around.  Images are captuerd when speed is > 0.  After driving car around, offload images to remote computer for training and copy control_data.csv .  Start autocar via Jupyter Lab or Notebook and train model via pytorch. Load model back to Nano after training and start main.py  Press X to launch autopilot.
+Install python requirements. Install ds4drv and connect PS4 Bluetooth controller to Ubuntu. Inside AutoCarJetsonNano/car, start main.py and drive car around.  Images are captuerd when speed is > 0.  After driving car around, offload images to remote computer for training and copy control_data.csv .  Start autocar via Jupyter Lab or Notebook and train model via pytorch. Load model back to Nano after training and start main.py  Press X to launch autopilot.
