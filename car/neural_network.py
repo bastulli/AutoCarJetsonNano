@@ -11,13 +11,13 @@ class Net(nn.Module):
         # convolutional layer (sees 224x224x3 image tensor)
         self.flatten   = Flatten()
         self.conv1 = nn.Conv2d(3, 24, 5, stride=2, padding=1)
-        self.conv2 = nn.Conv2d(24, 32, 5, stride=2, padding=1)
-        self.conv3 = nn.Conv2d(32, 64, 5, stride=2, padding=1)
-        self.conv4 = nn.Conv2d(64, 64, 3, stride=2, padding=1)
+        self.conv2 = nn.Conv2d(24, 32, 5, stride=1, padding=1)
+        self.conv3 = nn.Conv2d(32, 64, 5, stride=1, padding=1)
+        self.conv4 = nn.Conv2d(64, 64, 3, stride=1, padding=1)
         self.conv5 = nn.Conv2d(64, 64, 3, stride=1, padding=1)
         self.pool = nn.MaxPool2d(2, 2)
-        self.fc1 = nn.Linear(64, 50)
-        self.fc2 = nn.Linear(50, 1)
+        self.fc1 = nn.Linear(64*3*3, 144)
+        self.fc2 = nn.Linear(144, 1)
         self.dropout = nn.Dropout(0.1)
 
     def forward(self, x):

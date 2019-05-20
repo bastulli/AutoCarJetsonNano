@@ -116,10 +116,20 @@ class Autocar():
             self.model.eval()
             with torch.no_grad():
                 output = self.model(img)
-            self.angle_out = output.cpu().data.numpy()
-            #self.angle_out = np.argmax(output.cpu().data.numpy())#angle[0].cpu().numpy()
-            self.temp = count
+            outnump = output.cpu().data.numpy()
+            
+            if outnump >= 1:
+                self.angle_out = [[1]]
+                
+            elif outnump <= -1:
+                self.angle_out = [[-1]]
+            else:
+                self.angle_out = outnump
+                
             print(self.angle_out[0][0])
+            
+            self.temp = count
+            
             
         else:
             pass
