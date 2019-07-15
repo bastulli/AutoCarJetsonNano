@@ -1,5 +1,8 @@
+# For deleting jpegs in directory folder
 find . -type f -iname \*.jpg -delete
 
-sudo cp -r /home/joe/AutoCarJetsonNano/car/images /media/joe/usb
+# Move captured images to USB stick
+sudo cp -r /home/ENTER_NAME_HERE/AutoCarJetsonNano/car/images /media/joe/usb
 
-sudo cp -r /home/joe/AutoCarJetsonNano/car/control_data.csv /media/joe/usb
+# Move CSV data to USB stick
+sudo cp -r /home/ENTER_NAME_HERE/AutoCarJetsonNano/car/control_data.csv /media/joe/usb
