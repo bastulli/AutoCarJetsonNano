@@ -18,7 +18,7 @@ class Net(nn.Module):
         self.pool = nn.MaxPool2d(2, 2)
         self.fc1 = nn.Linear(64*3*3, 144)
         self.fc2 = nn.Linear(144, 1)
-        self.dropout = nn.Dropout(0.1)
+        self.dropout = nn.Dropout(0.15)
 
     def forward(self, x):
         # add sequence of convolutional and max pooling layers

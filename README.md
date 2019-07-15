@@ -7,7 +7,7 @@ PyTorch Python Neural Network Autonomous 1/10 Car for Nvidia Jetson Nano
 
 * **System Hardware**
     * Servo Driver https://www.amazon.com/dp/B014KTSMLA/ref=cm_sw_r_tw_dp_U_x_.PW4CbAD5YKP4
-    * Jetson Nano https://store.nvidia.com/store?Action=DisplayPage&Locale=en_US&SiteID=nvidia&id=QuickBuyCartPage
+    * Jetson Nano https://developer.nvidia.com/embedded/jetson-nano-developer-kit
     * Camera https://leopardimaging.com/product/li-imx219-mipi-ff-nano/
     * Wifi Chip https://www.amazon.com/gp/product/B01MZA1AB2/ref=ppx_yo_dt_b_search_asin_title?ie=UTF8&psc=1
     * Wifi Attenna https://www.arrow.com/en/products/2042811100/molex
